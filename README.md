@@ -1,2 +1,2 @@
 # Hazel
-Hazel
+Hazel Engine
