@@ -2,6 +2,8 @@
 
 #include "Hazel/Core.h"
 
+#include "hzpch.h"
+
 namespace Hazel {
 
 	/*
@@ -16,7 +18,7 @@ namespace Hazel {
 		None = 0,
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 		AppTick, AppUpdate, AppRender,
-		KeyPressed, KeyReleased, /*KeyTyped,*/
+		KeyPressed, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
 
@@ -68,7 +70,7 @@ namespace Hazel {
 		inline bool IsHandled() const { return m_Handled; } // 
 
 	protected:
-		bool m_Handled = false; // 表示该事件是否已经被处理过了
+		bool m_Handled = false; // 判断该事件是否已经被处理过了
 	};
 
 	class EventDispatcher // 该类的作用：管理不同类型的事件和事件监听器，以及分发事件给相应的监听器。

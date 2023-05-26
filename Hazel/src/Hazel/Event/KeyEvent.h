@@ -44,13 +44,11 @@ namespace Hazel {
 		// 这个非常有用，例如我们键盘输入一个字母时，按下一次后只输入一个字母，但是如果一直保持“按下”状态，那么会停顿一会后，然后才输入多个字母。
 	};
 
-	class HAZEL_API KeyReleasedEvent : public Event
+	class HAZEL_API KeyReleasedEvent : public KeyEvent
 	{
 	public:
 		KeyReleasedEvent(int keycode)
-			: m_KeyCode(keycode) {}
-
-		inline int GetKeyCode() const { return m_KeyCode; }
+			: KeyEvent(keycode) {}
 
 		std::string ToString() const override
 		{
@@ -60,8 +58,22 @@ namespace Hazel {
 		}
 
 		EVENT_CLASS_TYPE(KeyReleased)
-
-	private:
-		int m_KeyCode;
 	};
+
+	class HAZEL_API KeyTypedEvent : public KeyEvent
+	{
+	public:
+		KeyTypedEvent(int keycode)
+			: KeyEvent(keycode) {}
+
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "KeyTypedEvent: " << m_KeyCode;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(KeyTyped)
+	};
+
 }
