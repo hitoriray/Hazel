@@ -2,9 +2,9 @@
 
 #include "Hazel/Layer.h"
 
-#include "Hazel/Event/KeyEvent.h"
-#include "Hazel/Event/MouseEvent.h"
-#include "Hazel/Event/ApplicationEvent.h"
+#include "Hazel/Events/ApplicationEvent.h"
+#include "Hazel/Events/KeyEvent.h"
+#include "Hazel/Events/MouseEvent.h"
 
 namespace Hazel {
 
@@ -15,25 +15,14 @@ namespace Hazel {
 		ImGuiLayer();
 		~ImGuiLayer();
 
-		void OnAttach() override;
-		void OnDetach() override;
-		void OnUpdate() override;
-		void OnEvent(Event& event) override;
+		virtual void OnAttach() override; // 当图层被添加到应用程序时调用
+		virtual void OnDetach() override; // 当图层从应用程序中移除时调用
+		virtual void OnImGuiRender() override; // 当图层被渲染时调用
 
+		void Begin();
+		void End();
 	private:
-		bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& e);
-		bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e);
-		bool OnMouseMovedEvent(MouseMovedEvent& e);
-		bool OnMouseScrolledEvent(MouseScrolledEvent& e);
-
-		bool OnKeyPressedEvent(KeyPressedEvent& e);
-		bool OnKeyReleasedEvent(KeyReleasedEvent& e);
-		bool OnKeyTypedEvent(KeyTypedEvent& e);
-
-		bool OnWindowResizeEvent(WindowResizeEvent& e);
-
-	private:
-		float m_Time = 0.0f; // 用来存储当前的时间。这个变量用来计算每一帧的时间间隔，以便传递给ImGui的输入输出结构体。
+		float m_Time = 0.0f; // 用来存储当前的时间。这个变量用来计算每一帧的时间间隔，以便传递给ImGui的输入输出结构体
 	};
 
 }

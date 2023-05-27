@@ -5,7 +5,6 @@ namespace Hazel {
 
 	LayerStack::LayerStack()
 	{
-		m_LayerInsert = m_Layers.begin(); // 初始化m_LayerInsert迭代器，让它指向m_Layers的开头
 	}
 
 	LayerStack::~LayerStack()
@@ -22,9 +21,10 @@ namespace Hazel {
 	 */
 	void LayerStack::PushLayer(Layer* layer)
 	{
-		m_LayerInsert = m_Layers.emplace(m_LayerInsert, layer); // 在m_LayerInsert之前插入一个Layer，并更新m_LayerInsert
+		m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer); // // 在m_LayerInsertIndex之前插入一个Layer
+		m_LayerInsertIndex++; // 并更新m_LayerInsertIndex
 	}
-	
+
 	/**
 	 * @brief
 	 * 一个公有的函数，接受一个指向Layer对象的指针作为参数，并把它添加到m_Layers的后半部分，即m_LayerInsert迭代器之后。
@@ -47,7 +47,7 @@ namespace Hazel {
 		if (it != m_Layers.end()) // 如果找到了
 		{
 			m_Layers.erase(it); // 从m_Layers中移除layer
-			m_LayerInsert--; // 更新m_LayerInsert
+			m_LayerInsertIndex--; // 更新m_LayerInsertIndex
 		}
 	}
 

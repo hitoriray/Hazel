@@ -2,7 +2,7 @@
 
 #ifdef HZ_PLATFORM_WINDOWS
 
-extern Hazel::Application* Hazel::CreatApplication();
+extern Hazel::Application* Hazel::CreateApplication();
 
 int main(int argc, char** argv)
 {
@@ -11,9 +11,9 @@ int main(int argc, char** argv)
 	int a = 5;
 	HZ_INFO("Hello! Var={0}", a);
 
- 	auto app = Hazel::CreatApplication();
+	auto app = Hazel::CreateApplication();
 	app->Run();
 	delete app;
 }
 
-#endif // HZ_PLATFORM_WINDOWS
+#endif

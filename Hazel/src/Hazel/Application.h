@@ -4,8 +4,10 @@
 
 #include "Window.h"
 #include "Hazel/LayerStack.h"
-#include "Hazel/Event/Event.h"
-#include "Hazel/Event/ApplicationEvent.h"
+#include "Hazel/Events/Event.h"
+#include "Hazel/Events/ApplicationEvent.h"
+
+#include "Hazel/ImGui/ImGuiLayer.h"
 
 namespace Hazel {
 
@@ -13,7 +15,6 @@ namespace Hazel {
 	{
 	public:
 		Application();
-
 		virtual ~Application();
 
 		/* 运行Application */
@@ -24,7 +25,7 @@ namespace Hazel {
 
 		/* 对PushLayer和PushOverlay的封装 */
 		void PushLayer(Layer* layer);
-		void PushOverlay(Layer* overlay);
+		void PushOverlay(Layer* layer);
 
 		/* 获取当前窗口 */
 		inline Window& GetWindow() { return *m_Window; }
@@ -34,9 +35,10 @@ namespace Hazel {
 
 	private:
 		bool OnWindowClose(WindowCloseEvent& e); // 关闭窗口事件的处理函数
-
+	
 	private:
 		std::unique_ptr<Window> m_Window; // 创建一个Window的唯一指针
+		ImGuiLayer* m_ImGuiLayer; // 创建一个ImGuiLayer的指针
 		bool m_Running = true; // 用于判断Application是否正在运行
 		LayerStack m_LayerStack; // 创建一个LayerStack对象，用于管理Layer对象（如：UILayer、GraphicsLayer、SoundLayer等）
 
@@ -45,6 +47,6 @@ namespace Hazel {
 	};
 
 	// To be defined in CLIENT
-	Application* CreatApplication();
+	Application* CreateApplication();
 
 }

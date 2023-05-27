@@ -7,16 +7,6 @@ namespace Hazel {
 
 	std::shared_ptr<spdlog::logger> Log::s_CoreLogger;
 	std::shared_ptr<spdlog::logger> Log::s_ClientLogger;
-	 
-	Log::Log()
-	{
-
-	}
-
-	Log::~Log()
-	{
-
-	}
 
 	void Log::Init()
 	{
@@ -25,7 +15,7 @@ namespace Hazel {
 		s_CoreLogger = spdlog::stdout_color_mt("HAZEL"); // 创建一个彩色多线程记录器，并命名为HAZEL
 		s_CoreLogger->set_level(spdlog::level::trace); // 设置用来打印信息的级别（trace：打印所有信息）
 
-		s_ClientLogger = spdlog::stderr_color_mt("APP");
+		s_ClientLogger = spdlog::stdout_color_mt("APP");
 		s_ClientLogger->set_level(spdlog::level::trace);
 	}
 

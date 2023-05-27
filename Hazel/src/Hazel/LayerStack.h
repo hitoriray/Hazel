@@ -15,7 +15,6 @@ namespace Hazel {
 	* 层栈的顶部是最后一个添加的层，底部是第一个添加的层。
 	* 
 	*/
-
 	class LayerStack // LayerStack存储和管理不同层次的对象
 	{
 	public:
@@ -34,9 +33,8 @@ namespace Hazel {
 	private:
 		// 通过使用指针，类可以存储任何继承自基础Layer类的层类型，并在不知道它们具体类型的情况下调用它们的函数。
 		std::vector<Layer*> m_Layers; // 使用vector，因为每一帧都会被迭代
-
-		// 通过使用迭代器，类可以在不使用两个不同容器的情况下，把普通层和覆盖层分开。
-		std::vector<Layer*>::iterator m_LayerInsert; // 指向下一个要添加的Layer的位置（这个迭代器把向量分成两部分：前半部分包含了普通层，后半部分包含了覆盖层）
+		// 通过使用插入索引，类可以在不使用两个不同容器的情况下，把普通层（前半部分）和覆盖层（后半部分）分开。
+		unsigned int m_LayerInsertIndex = 0; // 指向LayerStack中下一个要添加的Layer的索引
 	};
-}
 
+}
