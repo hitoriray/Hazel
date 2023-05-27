@@ -21,7 +21,7 @@ namespace Hazel {
 		void SetVSync(bool enable) override;
 		bool IsVSync() const override;
 
-		// 获取GLFWwindow*（我自己添加的一个函数）
+		// 获取m_Window，void*表示返回的m_Window不一定是GLFWwindow*，可能是其他类型的指针，所以这里用void*来表示
 		inline void* GetNativeWindow() const override { return m_Window; }
 		
 	private:

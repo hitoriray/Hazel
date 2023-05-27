@@ -1,13 +1,12 @@
 # Hazel
+
 Hazel Engine
 
 
 
 ## Issue
 
-（1）2023 5.24
-
-引入GLFW时，vs2022上运行代码（链接）时报错：
+#### 1. 引入GLFW时，vs2022上运行代码（链接）时的报错问题（2023.5.24）
 
 ```
 1>GLFW.lib(init.obj) : error LNK2019: 无法解析的外部符号 _glfwSelectPlatform，函数 glfwInit 中引用了该符号
@@ -33,8 +32,7 @@ Hazel Engine
 
   请注意，这种解决方法是基于他人的经验，并不保证适用于所有情况。这只是一个尝试，可能会对你的项目产生积极影响。如果问题仍然存在，你可能需要进一步调查和尝试其他解决方案，如更新 GLFW 存储库或寻求相关支持渠道的帮助。最好的做法是参考 GLFW 存储库的文档、问题跟踪器或相关讨论来了解与 Visual Studio 2022 兼容性和构建问题相关的最新信息和解决方案。
 
-
-（2）2023 5.24
+#### 2. OnEvent函数中为什么要逆序遍历LayerStack?（2023.5.24）
 
 ```c++
 // In Hazel/Application.cpp OnEvent函数中为什么要逆序遍历LayerStack?
@@ -65,7 +63,83 @@ for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); ) {
 
 通过这种方式，这段代码可以实现逆序遍历LayerStack，并按照覆盖层优先的原则来处理事件。
 
-（3）2023 5.36
+#### 3. Hazel做到ImGui（latest imgui）时，出现不能正常点击和拖动窗口等事件问题（2023.5.26）
 
-Hazel做到ImGui（latest imgui）时，出现不能正常点击和拖动窗口等事件问题。
++ 解决方法：使用新版的ImGui函数接口，如AddMouseButtonEvent()和AddKeyEvent()等，可以参考imgui_impl_glfw.cpp中的代码。**【注意：新版API和旧版API不能混合使用！！！】**
+
++ 如果使用新版的接口时报错：
+```
+Assertion failed: GImGui != 0 && "No current context. Did you call ImGui::CreateContext() and ImGui::SetCurrentContext() ?", file E:\codes\C++\GameEngine\Hazel\Hazel\vendor\imgui\imgui.cpp, line 4139
+```
+
+这个错误表示你没有正确地创建和设置ImGui的上下文，ImGui的上下文是一个存储ImGui的状态和数据的结构体，你需要在使用ImGui之前调用ImGui::CreateContext()函数来创建一个上下文，并且调用ImGui::SetCurrentContext()函数来设置当前的上下文1。你可以在你的ImGuiLayer类的构造函数或者初始化函数中加上这样一行代码：
+
+```c++
+ImGui::SetCurrentContext(ImGui::CreateContext()); // 创建并设置ImGui的上下文
+```
+
+这样就可以避免这个错误了。
+
++ 此时，你的ImGuiLayer的构造函数应该长这样：
+
+```C++
+	ImGuiLayer::ImGuiLayer()
+		: Layer("ImGuiLayer")
+	{
+		ImGui::SetCurrentContext(ImGui::CreateContext()); // 创建并设置ImGui的上下文
+		Application& app = Application::Get();
+		ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)app.GetWindow().GetNativeWindow(), true); // 初始化GLFW的ImGui后端（否则会报错：bd为空指针）
+	}
+// 其中，GetNativeWindow()是我刚刚补充的，目的是为了获取GLFWwindow*
+```
+
++ 同时，你的OnMouseButtonPressedEvent和OnKeyPressedEvent等函数应该长这样：
+
+```C++
+	bool ImGuiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& e)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		if (e.GetMouseButton() >= 0 && e.GetMouseButton() < ImGuiMouseButton_COUNT)
+			io.AddMouseButtonEvent(e.GetMouseButton(), e.GetEventType() == EventType::MouseButtonPressed);
+		//io.MouseDown[e.GetMouseButton()] = true; // old version
+
+		return false; // return false 的原因是因为我们希望其他层也可以处理这个事件
+	}
+// 其中if语句是一个范围检查，确保鼠标按钮的索引在ImGuiMouseButton_COUNT以内，这是一个好习惯，可以避免一些潜在的错误。
+// 其实，e.GetEventType() == EventType::MouseButtonPressed可以改成true，并且OnMouseButtonReleasedEvent中的e.GetEventType() == EventType::MouseButtonReleased也可以改成false。
+// 因为，true表示按下，而且这个函数只在鼠标按钮按下事件中调用；同理，false表示释放。
+```
+
+```C++
+bool ImGuiLayer::OnKeyPressedEvent(KeyPressedEvent& e)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		if (e.GetKeyCode() >= 0 && e.GetKeyCode() < IM_ARRAYSIZE(io.KeysDown))
+			io.AddKeyEvent((ImGuiKey)e.GetKeyCode(), e.GetEventType() == EventType::KeyPressed);
+		// 	与OnMouseButtonPressedEvent类似，e.GetEventType() == EventType::KeyPressed可以改成true。
+    
+		// （旧版本）
+		/*
+		io.KeysDown[e.GetKeyCode()] = true;
+		io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
+		io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
+		io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
+		io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
+		*/
+		
+    	// （新版本）
+		if (io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL]) // 判断是否按下了Ctrl键
+			io.AddKeyEvent(ImGuiKey_ModCtrl, true); // 如果是，就添加ImGuiKey_ModCtrl事件
+		if (io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT])
+			io.AddKeyEvent(ImGuiKey_ModShift, true);
+		if (io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT])
+			io.AddKeyEvent(ImGuiKey_ModAlt, true);
+		if (io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER])
+			io.AddKeyEvent(ImGuiKey_ModSuper, true);
+
+		return false;
+	}
+```
+
++ **==注意：上述代码应该还隐含着一些bug，运行时就能看出来，而且按下按键时会有一个断言错误。因为我不是imgui专家（第一次正式接触imgui），所以目前我还找不到，等日后有空系统性学习这些东西后再回来看看。==**
 

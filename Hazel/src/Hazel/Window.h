@@ -39,8 +39,7 @@ namespace Hazel {
 		virtual void SetVSync(bool enable) = 0; // 用于设置垂直同步（VSync）功能的开启或关闭
 		virtual bool IsVSync() const = 0; // 用于检查垂直同步（VSync）功能是否开启
 
-		// 获取GLFWwindow*
-		virtual void* GetNativeWindow() const = 0;
+		virtual void* GetNativeWindow() const = 0; // 获取窗口的原生指针
 		
 		static Window* Create(const WindowProps& props = WindowProps()); // 用于创建窗口对象
 		// 使用静态函数Create可以通过传递窗口属性来创建窗口对象，而无需直接实例化特定窗口系统的对象。

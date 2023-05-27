@@ -5,7 +5,7 @@
 
 #include <glad/glad.h>
 
-#include "ImGui/ImGuiLayer.h"
+#include "Input.h"
 
 namespace Hazel {
 
@@ -40,6 +40,9 @@ namespace Hazel {
 			for (Layer* layer : m_LayerStack) // 遍历LayerStack，更新每一个Layer
 				layer->OnUpdate();
 
+			//auto [x, y] = Input::GetMousePosition();
+			//HZ_CORE_TRACE("{0}, {1}", x, y);
+
 			m_Window->OnUpdate(); // 更新窗口
 		}
 	}
@@ -62,7 +65,7 @@ namespace Hazel {
 		EventDispatcher dispatcher(e); // 创建一个事件分发器
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose)); // 绑定关闭窗口事件
 
-		HZ_CORE_TRACE("{0}", e); // 跟踪所有事件
+		//HZ_CORE_TRACE("{0}", e); // 跟踪所有事件
 
 		// 逆序遍历LayerStack，并按照覆盖层优先的原则来处理事件（详见README.md）
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
