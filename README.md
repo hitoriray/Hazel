@@ -63,7 +63,7 @@ for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); ) {
 
 通过这种方式，这段代码可以实现逆序遍历LayerStack，并按照覆盖层优先的原则来处理事件。
 
-#### 3. Hazel做到ImGui（latest imgui）时，出现不能正常点击和拖动窗口等事件问题（2023.5.26）
+#### 3. Hazel做到ImGui（latest imgui）时，出现不能正常点击和拖动窗口等事件问题（2023.5.26）【docking分支是运行正常的代码，但是使用的是旧版的ImGui】
 
 + 解决方法：使用新版的ImGui函数接口，如AddMouseButtonEvent()和AddKeyEvent()等，可以参考imgui_impl_glfw.cpp中的代码。**【注意：新版API和旧版API不能混合使用！！！】**
 
